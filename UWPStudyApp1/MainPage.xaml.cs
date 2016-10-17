@@ -182,7 +182,7 @@ namespace UWPStudyApp1
             await Windows.Storage.FileIO.WriteBufferAsync(sampleFile, buffer);
 
             var bufferReader = await Windows.Storage.FileIO.ReadBufferAsync(sampleFile);
-            using(var dataReader= Windows.Storage.Streams.DataReader.FromBuffer(bufferReader))
+            using (var dataReader = Windows.Storage.Streams.DataReader.FromBuffer(bufferReader))
             {
                 Text = dataReader.ReadString(bufferReader.Length);
             }
@@ -217,5 +217,5 @@ namespace UWPStudyApp1
             return Text;
         }
 
-        }
+    }
 }
