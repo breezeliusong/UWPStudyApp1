@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.Storage.Search;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -86,13 +87,17 @@ namespace UWPStudyApp1
             WriteTimestamp();
         }
 
-        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        private async void OperateFiles(object sender, RoutedEventArgs e)
         {
             //MyTextBlock.Text = await ReadTimestamp();
             //MyTextBlock.Text =await GetFolderAndFile();
             //MyTextBlock.Text = await QueryFile();
             //MyTextBlock.Text =await WriteAndReadTextToFile();
-            MyTextBlock.Text = await WriteAndReadTextToFile2();
+            //MyTextBlock.Text = await WriteAndReadTextToFile2();
+            //MyTextBlock.Text = await GetFileProperties();
+            //await  QueryFile();
+            //MyTextBlock.Text = await GetFilesBasicProperties();
+            MyTextBlock.Text = await GetFilesExtendedProperties();
         }
 
         //read the folders and files in picturesLibrary
@@ -141,6 +146,8 @@ namespace UWPStudyApp1
             return outputText.ToString();
         }
 
+
+        //get the allFiles by month in the PicturesLibrary
         private async Task<string> QueryFile()
         {
             StorageFolder picturesFolder = KnownFolders.PicturesLibrary;
@@ -150,9 +157,10 @@ namespace UWPStudyApp1
 
             IReadOnlyList<StorageFolder> folderList =
                 await queryResult.GetFoldersAsync();
-
+            Debug.WriteLine("folderList number is{0}", folderList.Count);
             StringBuilder outputText = new StringBuilder();
-
+            var fileList1 = await folderList[0].GetFilesAsync();
+            Debug.WriteLine("fileList1 number is{0}", fileList1.Count);
             foreach (StorageFolder folder in folderList)
             {
                 //get the total files in the folders and subfolders
@@ -217,5 +225,284 @@ namespace UWPStudyApp1
             return Text;
         }
 
+        //Enumerate all files in the pictrues library
+        private async Task<string> GetFileProperties()
+        {
+            var folder = Windows.Storage.KnownFolders.PicturesLibrary;
+            var query = folder.CreateFileQuery();
+            var files = await query.GetFilesAsync();
+
+            var files2 = await query.GetFilesAsync();
+            Debug.WriteLine("files2 number is {0}", files2.Count);
+            StringBuilder fileProperties = new StringBuilder();
+            foreach (Windows.Storage.StorageFile file in files)
+            {
+
+                Debug.WriteLine("files number is{0}", files.Count);
+                //get top-level file properties
+                fileProperties.Append(file.Name);
+                fileProperties.Append(file.FileType);
+            }
+            return fileProperties.ToString();
+        }
+
+        //get files basic properties
+        private async Task<string> GetFilesBasicProperties()
+        {
+            var folder = KnownFolders.PicturesLibrary;
+            var query = folder.CreateFileQuery();
+            var files = await query.GetFilesAsync();
+            StringBuilder builder = new StringBuilder();
+            foreach (StorageFile file in files)
+            {
+                Windows.Storage.FileProperties.BasicProperties basicProperties =
+                    await file.GetBasicPropertiesAsync();
+                string fileSize = string.Format("{0:n0}", basicProperties.Size);
+                builder.AppendLine("File size:" + fileSize + "bytes");
+                builder.AppendLine("Date Modified:" + basicProperties.DateModified);
+
+            }
+            return builder.ToString();
+        }
+
+
+        private async Task<string> GetFilesExtendedProperties()
+        {
+            const string dateAccessedProperty = "System.DateAccessed";
+            const string fileOwnerProperty = "System.FileOwner";
+
+            // Enumerate all files in the Pictures library.
+            var folder = KnownFolders.PicturesLibrary;
+            var query = folder.CreateFileQuery();
+            var files = await query.GetFilesAsync();
+
+            StringBuilder fileProperties = new StringBuilder();
+            foreach (Windows.Storage.StorageFile file in files)
+            {
+
+                // Define property names to be retrieved.
+                var propertyNames = new List<string>();
+                propertyNames.Add(dateAccessedProperty);
+                propertyNames.Add(fileOwnerProperty);
+
+                // Get extended properties.
+                IDictionary<string, object> extraProperties =
+                    await file.Properties.RetrievePropertiesAsync(propertyNames);
+
+                // Get date-accessed property.
+                var propValue = extraProperties[dateAccessedProperty];
+                if (propValue != null)
+                {
+                    fileProperties.AppendLine("Date accessed: " + propValue);
+                }
+
+                // Get file-owner property.
+                propValue = extraProperties[fileOwnerProperty];
+                if (propValue != null)
+                {
+                    fileProperties.AppendLine("File owner: " + propValue);
+                }
+            }
+            return fileProperties.ToString();
+        }
+
+        private void PickFiles(object sender, RoutedEventArgs e)
+        {
+            PickSingleFile();
+            //PickMultipleFile();
+           
+        }
+
+        //Pick a single file
+        private async void PickSingleFile()
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
+            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                MyTextBlock.Text = "Picked photo:" + file.Name;
+            }
+            else
+            {
+                MyTextBlock.Text = "Operation cancelled";
+            }
+        }
+
+        //pick  multiple files
+        private async void PickMultipleFile()
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
+            var files = await picker.PickMultipleFilesAsync();
+            StringBuilder builder = new StringBuilder();
+            if (files.Count > 0)
+            {
+                foreach (StorageFile file in files)
+                {
+                    builder.AppendLine(file.Name + "\n");
+                }
+                MyTextBlock.Text = builder.ToString();
+            }
+            else
+            {
+                MyTextBlock.Text = "Operation cancelled";
+            }
+        }
+
+
+        //pick a folder
+        private async void PickFolder()
+        {
+            var pickFolder = new Windows.Storage.Pickers.FolderPicker();
+            pickFolder.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+            pickFolder.FileTypeFilter.Add(".jpg");
+            StorageFolder folder = await pickFolder.PickSingleFolderAsync();
+            if (folder != null)
+            {
+                Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.
+                    AddOrReplace("PickedFolderToken", folder);
+                MyTextBlock.Text = folder.Name;
+            }
+            else
+            {
+                MyTextBlock.Text = "Cancelled";
+            }
+
+
+            //var folderPicker = new Windows.Storage.Pickers.FolderPicker();
+            //folderPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
+
+            //Windows.Storage.StorageFolder folder = await folderPicker.PickSingleFolderAsync();
+            //if (folder != null)
+            //{
+            //    // Application now has read/write access to all contents in the picked folder
+            //    // (including other sub-folder contents)
+            //    Windows.Storage.AccessCache.StorageApplicationPermissions.
+            //    FutureAccessList.AddOrReplace("PickedFolderToken", folder);
+            //    MyTextBlock.Text = "Picked folder: " + folder.Name;
+            //}
+            //else
+            //{
+            //    MyTextBlock.Text = "Operation cancelled.";
+            //}
+        }
+
+
+        private void PickFolders(object sender, RoutedEventArgs e)
+        {
+            PickFolder();
+        }
+        private void SaveFiles(object sender, RoutedEventArgs e)
+        {
+            PickSaveFile();
+        }
+
+        //save files
+        private async void PickSaveFile()
+        {
+            var pickSaveFile = new Windows.Storage.Pickers.FileSavePicker();
+            pickSaveFile.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
+            pickSaveFile.FileTypeChoices.Add("Image or Text", new List<string>() { ".txt" });
+            pickSaveFile.DefaultFileExtension = ".doc";
+            //default file name
+            pickSaveFile.SuggestedFileName = "new text";
+            StorageFile file=await pickSaveFile.PickSaveFileAsync();
+            if (file != null)
+            {
+                //prevent updates to the remote version of the file until finishing the change and call CompleteUpdateAsync
+                Windows.Storage.CachedFileManager.DeferUpdates(file);
+                //write to file
+                await FileIO.WriteTextAsync(file, "it's my create file");
+                //let windows know that we're finished changing the file so
+                //the other app can update the remote version of the file
+                //completing updates may require windows to ask for user input
+                Windows.Storage.Provider.FileUpdateStatus status = await Windows.Storage.CachedFileManager.CompleteUpdatesAsync(file);
+                if (status == Windows.Storage.Provider.FileUpdateStatus.Complete)
+                {
+                    MyTextBlock.Text = "File" + file.Name + "was saved";
+                }
+                else
+                {
+                    MyTextBlock.Text = "File" + file.Name + "couldn't be saved.";
+                }
+            }
+            else
+            {
+                MyTextBlock.Text = "cancelled";
+            }
+
+        }
+
+        private async void OpenHomeGroup(object sender, RoutedEventArgs e)
+        {
+            FileOpenPicker picker=new FileOpenPicker();
+            picker.ViewMode = PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = PickerLocationId.HomeGroup;
+            picker.FileTypeFilter.Clear();
+            //* represent all file type
+            picker.FileTypeFilter.Add("*");
+            var file=await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                MyTextBlock.Text = file.Name;
+            }
+            else
+            {
+                MyTextBlock.Text = "cancelled";
+            }
+        }
+
+        private void MySearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+
+        }
+
+        private async  void MySearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            string queryTerm= MySearchBox.Text;
+            Windows.Storage.Search.QueryOptions queryOptions = new Windows.Storage.Search.QueryOptions(CommonFileQuery.OrderBySearchRank, null);
+            queryOptions.UserSearchFilter = queryTerm;
+            StorageFileQueryResult queryResults = KnownFolders.PicturesLibrary.CreateFileQueryWithOptions(queryOptions);
+            var files = await queryResults.GetFilesAsync();
+            if (files.Count > 0)
+            {
+                MyTextBlock.Text+= (files.Count == 1) ? "One file found\n" : files.Count.ToString() + "files found\n";
+                foreach(var file in files)
+                {
+                    MyTextBlock.Text += file.Name + "\n";
+                }
+            }
+        }
+
+        private async void StreamVideo(object sender, RoutedEventArgs e)
+        {
+            Windows.Storage.Pickers.FileOpenPicker picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.HomeGroup;
+            picker.FileTypeFilter.Clear();
+            picker.FileTypeFilter.Add(".mp4");
+            picker.FileTypeFilter.Add(".wmv");
+            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
+                VideoBox.SetSource(stream, file.ContentType);
+                VideoBox.Stop();
+                VideoBox.Play();
+            }
+            else
+            {
+                // No file selected. Handle the error here.
+            }
+        }
     }
 }

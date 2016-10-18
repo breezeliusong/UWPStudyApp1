@@ -193,8 +193,17 @@
     <StackPanel  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Ellipse Fill="AliceBlue" Height="100" Width="100" StrokeThickness="5" Stroke="Black"/>
         <ProgressRing Width="100"  Height="100" Visibility="Visible" IsActive="True" Style="{StaticResource ProgressRingStyle1}"></ProgressRing>
-        <Button Click="Button_Click" Content="Create file"/>
-        <Button Click="Button_Click_1" Content="Read file"/>
+        <Button Click="Button_Click" Content="create files"/>
+        <Button Click="OperateFiles" Content="Operate files"/>
+        <Button Click="PickFiles" Content="Pick a file"/>
+        <Button Click="PickFolders" Content="Pick a folder"/>
+        <Button Click="SaveFiles" Content="save a file"/>
+        <Button Click="OpenHomeGroup" Content="Open HomeGroup file"/>
+        <AutoSuggestBox Name="MySearchBox" QueryIcon="Find"  TextChanged="MySearchBox_TextChanged" Width="200" PlaceholderText="search" QuerySubmitted="MySearchBox_QuerySubmitted"/>
         <TextBlock Name="MyTextBlock" TextWrapping="Wrap"/>
+        <Button Click="StreamVideo" Content="Open HomeGroup StreamVideo"/>
+        <Grid x:Name="Output" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1">
+            <MediaElement x:Name="VideoBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="400" Height="300"/>
+        </Grid>
     </StackPanel>
 </Page>
