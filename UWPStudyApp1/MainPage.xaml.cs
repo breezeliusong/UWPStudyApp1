@@ -30,10 +30,8 @@ namespace UWPStudyApp1
     {
         Windows.Storage.ApplicationDataContainer loacalSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
         Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
-        Windows.Storage.ApplicationDataContainer roamingSettings =
-         Windows.Storage.ApplicationData.Current.RoamingSettings;
-        Windows.Storage.StorageFolder roamingFolder =
-            Windows.Storage.ApplicationData.Current.RoamingFolder;
+        Windows.Storage.ApplicationDataContainer roamingSettings = Windows.Storage.ApplicationData.Current.RoamingSettings;
+        Windows.Storage.StorageFolder roamingFolder = Windows.Storage.ApplicationData.Current.RoamingFolder;
         Windows.Storage.StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
 
         public MainPage()
@@ -49,8 +47,7 @@ namespace UWPStudyApp1
         {
             //try
             //{
-            Windows.Globalization.DateTimeFormatting.DateTimeFormatter formatter =
-                new Windows.Globalization.DateTimeFormatting.DateTimeFormatter("longtime");
+            Windows.Globalization.DateTimeFormatting.DateTimeFormatter formatter = new Windows.Globalization.DateTimeFormatting.DateTimeFormatter("longtime");
             StorageFile sampleFile = await localFolder.CreateFileAsync("dataFile.txt", CreationCollisionOption.ReplaceExisting);
             StringBuilder ss = new StringBuilder();
             ss.Append(formatter.Format(DateTime.Now));
@@ -79,7 +76,6 @@ namespace UWPStudyApp1
                 new FileNotFoundException("dataFile.txt is not find");
                 return timestamp;
             }
-
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -122,6 +118,7 @@ namespace UWPStudyApp1
             return outputText.ToString();
         }
 
+        //get all items in picturesLibrary
         private async Task<string> GetItems()
         {
             StorageFolder picturesFolder = KnownFolders.PicturesLibrary;
@@ -265,7 +262,7 @@ namespace UWPStudyApp1
             return builder.ToString();
         }
 
-
+        //Get Files Extended Properties
         private async Task<string> GetFilesExtendedProperties()
         {
             const string dateAccessedProperty = "System.DateAccessed";
@@ -310,7 +307,7 @@ namespace UWPStudyApp1
         {
             PickSingleFile();
             //PickMultipleFile();
-           
+
         }
 
         //Pick a single file
@@ -376,24 +373,6 @@ namespace UWPStudyApp1
             {
                 MyTextBlock.Text = "Cancelled";
             }
-
-
-            //var folderPicker = new Windows.Storage.Pickers.FolderPicker();
-            //folderPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
-
-            //Windows.Storage.StorageFolder folder = await folderPicker.PickSingleFolderAsync();
-            //if (folder != null)
-            //{
-            //    // Application now has read/write access to all contents in the picked folder
-            //    // (including other sub-folder contents)
-            //    Windows.Storage.AccessCache.StorageApplicationPermissions.
-            //    FutureAccessList.AddOrReplace("PickedFolderToken", folder);
-            //    MyTextBlock.Text = "Picked folder: " + folder.Name;
-            //}
-            //else
-            //{
-            //    MyTextBlock.Text = "Operation cancelled.";
-            //}
         }
 
 
@@ -415,7 +394,7 @@ namespace UWPStudyApp1
             pickSaveFile.DefaultFileExtension = ".doc";
             //default file name
             pickSaveFile.SuggestedFileName = "new text";
-            StorageFile file=await pickSaveFile.PickSaveFileAsync();
+            StorageFile file = await pickSaveFile.PickSaveFileAsync();
             if (file != null)
             {
                 //prevent updates to the remote version of the file until finishing the change and call CompleteUpdateAsync
@@ -442,15 +421,17 @@ namespace UWPStudyApp1
 
         }
 
+
+        //home group
         private async void OpenHomeGroup(object sender, RoutedEventArgs e)
         {
-            FileOpenPicker picker=new FileOpenPicker();
+            FileOpenPicker picker = new FileOpenPicker();
             picker.ViewMode = PickerViewMode.Thumbnail;
             picker.SuggestedStartLocation = PickerLocationId.HomeGroup;
             picker.FileTypeFilter.Clear();
             //* represent all file type
             picker.FileTypeFilter.Add("*");
-            var file=await picker.PickSingleFileAsync();
+            var file = await picker.PickSingleFileAsync();
             if (file != null)
             {
                 MyTextBlock.Text = file.Name;
@@ -466,43 +447,91 @@ namespace UWPStudyApp1
 
         }
 
-        private async  void MySearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        //
+        private async void MySearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            string queryTerm= MySearchBox.Text;
+            string queryTerm = MySearchBox.Text;
             Windows.Storage.Search.QueryOptions queryOptions = new Windows.Storage.Search.QueryOptions(CommonFileQuery.OrderBySearchRank, null);
             queryOptions.UserSearchFilter = queryTerm;
             StorageFileQueryResult queryResults = KnownFolders.PicturesLibrary.CreateFileQueryWithOptions(queryOptions);
             var files = await queryResults.GetFilesAsync();
             if (files.Count > 0)
             {
-                MyTextBlock.Text+= (files.Count == 1) ? "One file found\n" : files.Count.ToString() + "files found\n";
-                foreach(var file in files)
+                MyTextBlock.Text += (files.Count == 1) ? "One file found\n" : files.Count.ToString() + "files found\n";
+                foreach (var file in files)
                 {
                     MyTextBlock.Text += file.Name + "\n";
                 }
             }
         }
 
-        private async void StreamVideo(object sender, RoutedEventArgs e)
+        //private async void StreamVideo(object sender, RoutedEventArgs e)
+        //{
+        //    Windows.Storage.Pickers.FileOpenPicker picker = new Windows.Storage.Pickers.FileOpenPicker();
+        //    picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+        //    picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.HomeGroup;
+        //    picker.FileTypeFilter.Clear();
+        //    picker.FileTypeFilter.Add(".mp4");
+        //    picker.FileTypeFilter.Add(".wmv");
+        //    Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+        //    if (file != null)
+        //    {
+        //        var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
+        //        VideoBox.SetSource(stream, file.ContentType);
+        //        VideoBox.Stop();
+        //        VideoBox.Play();
+        //    }
+        //    else
+        //    {
+        //        // No file selected. Handle the error here.
+        //    }
+        //}
+
+        async Task<System.Collections.Generic.IReadOnlyList<StorageFile>> GetLibraryFilesAsync(StorageFolder folder)
         {
-            Windows.Storage.Pickers.FileOpenPicker picker = new Windows.Storage.Pickers.FileOpenPicker();
-            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
-            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.HomeGroup;
-            picker.FileTypeFilter.Clear();
-            picker.FileTypeFilter.Add(".mp4");
-            picker.FileTypeFilter.Add(".wmv");
-            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
-            if (file != null)
+            var query = folder.CreateFileQuery();
+            return await query.GetFilesAsync();
+        }
+
+
+        private async void CheckAvailabilityOfFilesInPicturesLibrary()
+        {
+            // Determine availability of all files within Pictures library.
+            var files = await GetLibraryFilesAsync(KnownFolders.PicturesLibrary);
+            StringBuilder fileInfo = new StringBuilder();
+            for (int i = 0; i < files.Count; i++)
             {
-                var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
-                VideoBox.SetSource(stream, file.ContentType);
-                VideoBox.Stop();
-                VideoBox.Play();
+                StorageFile file = files[i];
+
+                fileInfo.AppendFormat("{0} (on {1}) is {2}",
+                            file.Name,
+                            file.Provider.DisplayName,
+                            file.IsAvailable ? "available" : "not available");
             }
-            else
-            {
-                // No file selected. Handle the error here.
-            }
+            MyTextBlock.Text = fileInfo.ToString();
+        }
+
+        private async void Availability(object sender, RoutedEventArgs e)
+        {
+            CheckAvailabilityOfFilesInPicturesLibrary();
+            //var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            //picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+            //picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+            //picker.FileTypeFilter.Add(".jpg");
+            //picker.FileTypeFilter.Add(".jpeg");
+            //picker.FileTypeFilter.Add(".png");
+            //Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+            //var mru = Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList;
+            //string mruToken = null;
+            //if (file != null)
+            //{
+            // mruToken = mru.Add(file, "profile pic");
+            //}
+
+            //StorageFile retrievedFile = await mru.GetFileAsync(mruToken);
+            Windows.Storage.StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
+            MyTextBlock.Text = installedLocation.Name;
+            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///dataFile.txt"));
         }
     }
 }

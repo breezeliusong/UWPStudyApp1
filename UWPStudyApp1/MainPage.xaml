@@ -201,9 +201,7 @@
         <Button Click="OpenHomeGroup" Content="Open HomeGroup file"/>
         <AutoSuggestBox Name="MySearchBox" QueryIcon="Find"  TextChanged="MySearchBox_TextChanged" Width="200" PlaceholderText="search" QuerySubmitted="MySearchBox_QuerySubmitted"/>
         <TextBlock Name="MyTextBlock" TextWrapping="Wrap"/>
-        <Button Click="StreamVideo" Content="Open HomeGroup StreamVideo"/>
-        <Grid x:Name="Output" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1">
-            <MediaElement x:Name="VideoBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="400" Height="300"/>
-        </Grid>
+        <Button Click="Availability" Content="Availability a OneDrive file"/>
+
     </StackPanel>
 </Page>
