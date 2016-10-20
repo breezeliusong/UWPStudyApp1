@@ -191,6 +191,7 @@
     </Page.Resources>
 
     <StackPanel  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Button  Content="To sqlite page" Click="SqlitePage" Background="AliceBlue"/>
         <Ellipse Fill="AliceBlue" Height="100" Width="100" StrokeThickness="5" Stroke="Black"/>
         <ProgressRing Width="100"  Height="100" Visibility="Visible" IsActive="True" Style="{StaticResource ProgressRingStyle1}"></ProgressRing>
         <Button Click="Button_Click" Content="create files"/>

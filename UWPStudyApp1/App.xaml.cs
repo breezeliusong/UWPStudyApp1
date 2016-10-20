@@ -15,6 +15,11 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
+
+//The user either minimized or switched away from your app and didn't return to it within a few seconds.
+//it will call EnteredBackground event and then call onSuspending() method, 
+//then The LeavingBackground event is fired just before your application UI is visible and before entering the running in foreground state. 
+//It also fires when the user switches back to your app.
 namespace UWPStudyApp1
 {
     /// <summary>
@@ -29,7 +34,43 @@ namespace UWPStudyApp1
         public App()
         {
             this.InitializeComponent();
+            this.Resuming += App_Resuming;
             this.Suspending += OnSuspending;
+            this.EnteredBackground += App_EnteredBackground;
+            this.LeavingBackground += App_LeavingBackground;
+        }
+
+        //the best location to load UI assets 
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            base.OnActivated(args);
+        }
+
+        //leave background to forground
+        /*
+         * is fired just before your application UI is visible and before entering the running in foreground state.
+         *  It also fires when the user switches back to your app
+         */
+        private void App_LeavingBackground(object sender, LeavingBackgroundEventArgs e)
+        {
+            //the best place to verify that your UI is ready
+            //throw new NotImplementedException();
+            
+        }
+        //enter background  
+        //can stop UI rendering work and animations
+        private void App_EnteredBackground(object sender, EnteredBackgroundEventArgs e)
+        {
+            //throw new NotImplementedException();
+            //if you are doing work in the background (for example, audio playback or by using an extended execution session), 
+            //it is best to save your data asynchronously from your EnteredBackground event handler
+        }
+
+        //prelaunch then resuming
+        private void App_Resuming(object sender, object e)
+        {
+            //the best location to load UI assets 
+            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -99,6 +140,7 @@ namespace UWPStudyApp1
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
+            //the best place to save your app state
             //TODO: Save application state and stop any background activity
             deferral.Complete();
         }

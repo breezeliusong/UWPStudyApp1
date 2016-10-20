@@ -11,6 +11,7 @@ using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Search;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -33,12 +34,35 @@ namespace UWPStudyApp1
         Windows.Storage.ApplicationDataContainer roamingSettings = Windows.Storage.ApplicationData.Current.RoamingSettings;
         Windows.Storage.StorageFolder roamingFolder = Windows.Storage.ApplicationData.Current.RoamingFolder;
         Windows.Storage.StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
-
+        //third when navigate to this page ,it will be called after the OnNavigatedTo() method
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+        }
+        //second when navigate to this page ,it will be called
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+        }
+        //when navigate to other page ,it will be called
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+        }
+        //first Instantiate
         public MainPage()
         {
             this.InitializeComponent();
-            Debug.WriteLine(installedLocation.ToString());
-
+            SystemNavigationManager.GetForCurrentView().BackRequested += (s, a) =>
+            {
+                Frame rootFrame = Window.Current.Content as Frame;
+                if (rootFrame == null) return;
+                if(rootFrame.CanGoBack && a.Handled==false)
+                {
+                    a.Handled = true;
+                    rootFrame.GoBack();
+                }
+            };
         }
 
 
@@ -532,6 +556,11 @@ namespace UWPStudyApp1
             Windows.Storage.StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
             MyTextBlock.Text = installedLocation.Name;
             StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///dataFile.txt"));
+        }
+
+        private void SqlitePage(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(MySqlitePage));
         }
     }
 }
