@@ -16,6 +16,18 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
+
+/*
+ * 
+ * //create a database
+   path = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "db.sqlite");
+   conn = new SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), path);
+   //create a table associate with User object
+   conn.CreateTable<User>();
+ * 
+ * 
+ * 
+ */
 namespace UWPStudyApp1
 {
     /// <summary>
@@ -67,7 +79,7 @@ namespace UWPStudyApp1
         }
 
 
-        // Retrieve the specific contact from the database. 
+        // Retrieve the specific user from the database. 
         public User ReadContact(int contactid)
         {
             var sqlpath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "Userdb.sqlite");

@@ -22,6 +22,38 @@ using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
+//this page  include File and folder operate 
+
+/*first you should specify a object file or folderor setting
+*if you want to operate a file ,you should find the file then operate it 
+*we can use StorageFolder.CreateFileAsync() to create a file 
+* or wo can find a file in a folder by using the method of StorageFolder instance.GetFileAsync("filename.suffix")
+*then operate it by FileIO.WriteTextAsync(file,string) to write text to the file
+* and use FileIO.ReadTextAsync(File) to read the file content
+* 
+*such as folderLibrary pictureLibrary ,music library and video library 
+*we can using Windows.Storage.KnownFolders.PictureLibrary to locate to the folder,
+*then we can operate it .(folder is the specify Library)
+*folder.GetFilesAsync() method get the first directory files in the pictureLibrary
+*folder.GetFolderAsync() method get the first directory folders in the Library
+*folder.GetItemsAsync() get all the files and folders in the first directory
+* we can get the allFiles by category in the Library(PictureLibrary)
+* 
+* Writing and Reading bytes
+* 
+*  How to use picker
+         * step:
+         * new a picker()
+         * set viewMode
+         * set location
+         * set fileType
+         * picked operate
+         * 
+         * 
+*
+*
+*create and retrieve a simple local setting         
+*/
 namespace UWPStudyApp1
 {
     /// <summary>
@@ -33,7 +65,9 @@ namespace UWPStudyApp1
         Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
         Windows.Storage.ApplicationDataContainer roamingSettings = Windows.Storage.ApplicationData.Current.RoamingSettings;
         Windows.Storage.StorageFolder roamingFolder = Windows.Storage.ApplicationData.Current.RoamingFolder;
+
         Windows.Storage.StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
+
         //third when navigate to this page ,it will be called after the OnNavigatedTo() method
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
@@ -110,16 +144,26 @@ namespace UWPStudyApp1
         private async void OperateFiles(object sender, RoutedEventArgs e)
         {
             //MyTextBlock.Text = await ReadTimestamp();
-            //MyTextBlock.Text =await GetFolderAndFile();
-            //MyTextBlock.Text = await QueryFile();
+            //MyTextBlock.Text = await GetFolderAndFile();
+            MyTextBlock.Text = await QueryFile();
             //MyTextBlock.Text =await WriteAndReadTextToFile();
             //MyTextBlock.Text = await WriteAndReadTextToFile2();
             //MyTextBlock.Text = await GetFileProperties();
             //await  QueryFile();
             //MyTextBlock.Text = await GetFilesBasicProperties();
-            MyTextBlock.Text = await GetFilesExtendedProperties();
+            //MyTextBlock.Text = await GetFilesExtendedProperties();
+            //await GetItems();
         }
 
+
+        /*
+         * such as folderLibrary pictureLibrary ,music library and video library 
+         * we can using Windows.Storage.KnownFolders.PictureLibrary to locate to the folder,
+         * then we can operate it .
+         * folder.GetFilesAsync() method get the first directory files in the pictureLibrary
+         * folder.GetFolderAsync() method get the first directory folders in the Library
+         * 
+         */ 
         //read the folders and files in picturesLibrary
         private async Task<string> GetFolderAndFile()
         {
@@ -127,6 +171,9 @@ namespace UWPStudyApp1
             StorageFolder picturesFolder = KnownFolders.PicturesLibrary;
             StringBuilder outputText = new StringBuilder();
             IReadOnlyList<StorageFile> fileList = await picturesFolder.GetFilesAsync();
+
+            Debug.WriteLine(fileList.Count.ToString());
+
             outputText.AppendLine("Files");
             foreach (var file in fileList)
             {
@@ -134,6 +181,8 @@ namespace UWPStudyApp1
             }
 
             IReadOnlyList<StorageFolder> folderList = await picturesFolder.GetFoldersAsync();
+            Debug.WriteLine(folderList.Count.ToString());
+
             outputText.AppendLine("Folders");
             foreach (StorageFolder folder in folderList)
             {
@@ -143,6 +192,8 @@ namespace UWPStudyApp1
         }
 
         //get all items in picturesLibrary
+
+
         private async Task<string> GetItems()
         {
             StorageFolder picturesFolder = KnownFolders.PicturesLibrary;
@@ -150,43 +201,38 @@ namespace UWPStudyApp1
 
             IReadOnlyList<IStorageItem> itemsList =
                 await picturesFolder.GetItemsAsync();
-
+            Debug.WriteLine(itemsList.Count.ToString());
             foreach (var item in itemsList)
             {
                 if (item is StorageFolder)
                 {
                     outputText.Append(item.Name + " folder\n");
-
                 }
                 else
                 {
                     outputText.Append(item.Name + "\n");
-
                 }
             }
             return outputText.ToString();
         }
 
-
-        //get the allFiles by month in the PicturesLibrary
+        /// <summary>
+        /// Category
+        /// get the list classifed by month  if have pictures in two month ,the num of list is 2;
+        /// </summary>
+        /// <returns></returns>
+        //get the category folder by month in the PicturesLibrary
         private async Task<string> QueryFile()
         {
             StorageFolder picturesFolder = KnownFolders.PicturesLibrary;
-
             StorageFolderQueryResult queryResult =
                 picturesFolder.CreateFolderQuery(CommonFolderQuery.GroupByMonth);
-
-            IReadOnlyList<StorageFolder> folderList =
-                await queryResult.GetFoldersAsync();
-            Debug.WriteLine("folderList number is{0}", folderList.Count);
+            //get the list classifed by month  if have pictures in two month ,the num of list is 2;
+            IReadOnlyList<StorageFolder> folderList =await queryResult.GetFoldersAsync();
             StringBuilder outputText = new StringBuilder();
-            var fileList1 = await folderList[0].GetFilesAsync();
-            Debug.WriteLine("fileList1 number is{0}", fileList1.Count);
             foreach (StorageFolder folder in folderList)
             {
-                //get the total files in the folders and subfolders
                 IReadOnlyList<StorageFile> fileList = await folder.GetFilesAsync();
-
                 // Print the month and number of files in this group.
                 outputText.AppendLine(folder.Name + " (" + fileList.Count + ")");
 
@@ -223,7 +269,9 @@ namespace UWPStudyApp1
         {
             string Text = null;
             StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+            //create
             StorageFile sampleFile = await storageFolder.CreateFileAsync("sample.txt", Windows.Storage.CreationCollisionOption.ReplaceExisting);
+            //accessMode
             var stream = await sampleFile.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
             using (var outputStream = stream.GetOutputStreamAt(0))
             {
@@ -253,8 +301,6 @@ namespace UWPStudyApp1
             var query = folder.CreateFileQuery();
             var files = await query.GetFilesAsync();
 
-            var files2 = await query.GetFilesAsync();
-            Debug.WriteLine("files2 number is {0}", files2.Count);
             StringBuilder fileProperties = new StringBuilder();
             foreach (Windows.Storage.StorageFile file in files)
             {
@@ -334,6 +380,14 @@ namespace UWPStudyApp1
 
         }
 
+        /*
+         * step:
+         * new a picker()
+         * set viewMode
+         * set location
+         * set fileType
+         * picked operate
+         */
         //Pick a single file
         private async void PickSingleFile()
         {
@@ -561,6 +615,43 @@ namespace UWPStudyApp1
         private void SqlitePage(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(MySqlitePage));
+        }
+
+
+        //create and retrieve a simple local setting
+        Windows.Storage.ApplicationDataContainer localSetting = Windows.Storage.ApplicationData.Current.LocalSettings;
+        Windows.Storage.StorageFolder localFolder1 = Windows.Storage.ApplicationData.Current.LocalFolder;
+        private void createAndRetrieveLocalSetting()
+        {
+            //simple setting set
+            localSetting.Values["exampleSetting"] = "helloWindows";
+            //simple setting get
+            object value = localSetting.Values["exampleSetting"];
+
+
+            //composite setting set
+            ApplicationDataCompositeValue composite = new Windows.Storage.ApplicationDataCompositeValue();
+            composite["intVal"] = 1;
+            composite["strVal"] = "string";
+            localSetting.Values["exampleCompositeSetting"] = composite;
+            //composite setting get
+            Windows.Storage.ApplicationDataCompositeValue compositeGet = (Windows.Storage.ApplicationDataCompositeValue)localSetting.Values["exampleCompositeSetting"];
+            if (composite == null)
+            {
+                //
+            }
+            else
+            {
+                var intVal = compositeGet["intVal"];
+                var strVal = compositeGet["strVal"];
+            }
+
+
+        }
+
+        private void LunchPage(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(LaunchPage));
         }
     }
 }
