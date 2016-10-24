@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -81,6 +82,7 @@ namespace UWPStudyApp1
     /// </summary>
     sealed partial class App : Application
     {
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -88,16 +90,35 @@ namespace UWPStudyApp1
         public App()
         {
             this.InitializeComponent();
-            this.Resuming += App_Resuming;
+            //this.Resuming += App_Resuming;
             this.Suspending += OnSuspending;
-            this.EnteredBackground += App_EnteredBackground;
-            this.LeavingBackground += App_LeavingBackground;
+            string familyName = Windows.ApplicationModel.Package.Current.Id.FamilyName;
+            Debug.WriteLine(familyName);
+            //this.EnteredBackground += App_EnteredBackground;
+            //this.LeavingBackground += App_LeavingBackground;
         }
 
         //the best location to load UI assets 
         protected override void OnActivated(IActivatedEventArgs args)
         {
             base.OnActivated(args);
+            // Window management
+            Frame rootFrame = Window.Current.Content as Frame;
+            if (rootFrame == null)
+            {
+                rootFrame = new Frame();
+                Window.Current.Content = rootFrame;
+            }
+
+            //// Code specific to launch for results
+            //var protocolForResultsArgs = (ProtocolForResultsActivatedEventArgs)args;
+            //// Open the page that we created to handle activation for results.
+            //rootFrame.Navigate(typeof(MainPage), protocolForResultsArgs);
+
+            rootFrame.Navigate(typeof(MainPage));
+
+            // Ensure the current window is active.
+            Window.Current.Activate();
         }
 
         //leave background to forground

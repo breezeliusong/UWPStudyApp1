@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
@@ -73,11 +74,32 @@ namespace UWPStudyApp1
         {
             base.OnNavigatedFrom(e);
         }
+
+
+        private Windows.System.ProtocolForResultsOperation _operation = null;
         //second when navigate to this page ,it will be called
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            Debug.WriteLine("OnnavigetedTo method is called");
+            var protocolForResultsArgs = e.Parameter as ProtocolForResultsActivatedEventArgs;
+            if (protocolForResultsArgs != null)
+            {
+
+            // Set the ProtocolForResultsOperation field.
+            _operation = protocolForResultsArgs.ProtocolForResultsOperation;
+
+            if (protocolForResultsArgs.Data.ContainsKey("TestData"))
+            {
+                string dataFromCaller = protocolForResultsArgs.Data["TestData"] as string;
+                Debug.WriteLine("dataFromCaller is passed");
+            }
+            ValueSet result = new ValueSet();
+            result["ReturnedData"] = "The returned result";
+            _operation.ReportCompleted(result);
+            }
         }
+
         //when navigate to other page ,it will be called
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
@@ -652,6 +674,21 @@ namespace UWPStudyApp1
         private void LunchPage(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(LaunchPage));
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            //URI to launch
+            var uriBing = new Uri("myapp:");
+            //option to show a warning
+            var promptOptions = new Windows.System.LauncherOptions();
+            //set recommended app
+            //promptOptions.PreferredApplicationPackageFamilyName = "Contoso.URIApp_8wknc82pole";
+            //promptOptions.PreferredApplicationDisplayName = "Contoso URI Ap";
+            //promptOptions.DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseLess;
+
+            promptOptions.TreatAsUntrusted = true;
+            var success = await Windows.System.Launcher.LaunchUriAsync(uriBing, promptOptions);
         }
     }
 }

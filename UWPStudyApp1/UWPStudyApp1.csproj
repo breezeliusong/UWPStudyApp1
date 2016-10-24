@@ -95,6 +95,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Expander.cs" />
     <Compile Include="LaunchPage.xaml.cs">
       <DependentUpon>LaunchPage.xaml</DependentUpon>
     </Compile>
@@ -139,6 +140,10 @@
     <Page Include="SqlitePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

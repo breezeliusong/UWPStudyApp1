@@ -20,6 +20,14 @@
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="myapp" ReturnResults="optional">
+            <uap:Logo>Assets\SplashScreen.png</uap:Logo>
+            <uap:DisplayName>UWPStudyApp1</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>
