@@ -66,6 +66,7 @@ namespace UWPStudyApp1
         Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
         Windows.Storage.ApplicationDataContainer roamingSettings = Windows.Storage.ApplicationData.Current.RoamingSettings;
         Windows.Storage.StorageFolder roamingFolder = Windows.Storage.ApplicationData.Current.RoamingFolder;
+        IReadOnlyDictionary<string, ApplicationDataContainer> con = ApplicationData.Current.LocalSettings.Containers;
 
         Windows.Storage.StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
 
@@ -73,6 +74,10 @@ namespace UWPStudyApp1
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
+            foreach (var ss in con)
+            {
+                var sk = ss.Value.Values;
+            }
         }
 
 
@@ -86,17 +91,17 @@ namespace UWPStudyApp1
             if (protocolForResultsArgs != null)
             {
 
-            // Set the ProtocolForResultsOperation field.
-            _operation = protocolForResultsArgs.ProtocolForResultsOperation;
+                // Set the ProtocolForResultsOperation field.
+                _operation = protocolForResultsArgs.ProtocolForResultsOperation;
 
-            if (protocolForResultsArgs.Data.ContainsKey("TestData"))
-            {
-                string dataFromCaller = protocolForResultsArgs.Data["TestData"] as string;
-                Debug.WriteLine("dataFromCaller is passed");
-            }
-            ValueSet result = new ValueSet();
-            result["ReturnedData"] = "The returned result";
-            _operation.ReportCompleted(result);
+                if (protocolForResultsArgs.Data.ContainsKey("TestData"))
+                {
+                    string dataFromCaller = protocolForResultsArgs.Data["TestData"] as string;
+                    Debug.WriteLine("dataFromCaller is passed");
+                }
+                ValueSet result = new ValueSet();
+                result["ReturnedData"] = "The returned result";
+                _operation.ReportCompleted(result);
             }
         }
 
@@ -113,7 +118,7 @@ namespace UWPStudyApp1
             {
                 Frame rootFrame = Window.Current.Content as Frame;
                 if (rootFrame == null) return;
-                if(rootFrame.CanGoBack && a.Handled==false)
+                if (rootFrame.CanGoBack && a.Handled == false)
                 {
                     a.Handled = true;
                     rootFrame.GoBack();
@@ -185,7 +190,7 @@ namespace UWPStudyApp1
          * folder.GetFilesAsync() method get the first directory files in the pictureLibrary
          * folder.GetFolderAsync() method get the first directory folders in the Library
          * 
-         */ 
+         */
         //read the folders and files in picturesLibrary
         private async Task<string> GetFolderAndFile()
         {
@@ -250,7 +255,7 @@ namespace UWPStudyApp1
             StorageFolderQueryResult queryResult =
                 picturesFolder.CreateFolderQuery(CommonFolderQuery.GroupByMonth);
             //get the list classifed by month  if have pictures in two month ,the num of list is 2;
-            IReadOnlyList<StorageFolder> folderList =await queryResult.GetFoldersAsync();
+            IReadOnlyList<StorageFolder> folderList = await queryResult.GetFoldersAsync();
             StringBuilder outputText = new StringBuilder();
             foreach (StorageFolder folder in folderList)
             {
@@ -641,7 +646,9 @@ namespace UWPStudyApp1
 
 
         //create and retrieve a simple local setting
-        Windows.Storage.ApplicationDataContainer localSetting = Windows.Storage.ApplicationData.Current.LocalSettings;
+        ApplicationDataContainer localSetting = Windows.Storage.ApplicationData.Current.LocalSettings;
+
+
         Windows.Storage.StorageFolder localFolder1 = Windows.Storage.ApplicationData.Current.LocalFolder;
         private void createAndRetrieveLocalSetting()
         {
