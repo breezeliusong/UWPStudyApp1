@@ -55,15 +55,15 @@ using Windows.UI.Xaml.Navigation;
  *                  when switch away            when switch back                                      
  *                         |                           |      
  *                 Running in background >>>>>Running in background                               
- *                         |
- *                     trigger event               trigger event                      
- *                   EnteredBackground           LeavingBackground                  
- *                App_EnteredBackground() =====>App_LeavingBackground()        
+ *                         |                           |
+ *                     trigger event              trigger event                      
+ *                   EnteredBackground          LeavingBackground                  
+ *                App_EnteredBackground() ====>App_LeavingBackground()        
  *   
  *   
  *   
- *                               -------long time switch--------
- *                              |                               |
+ *                              -------long time switch--------
+ *                             |                               |
  *                    when switch away                    when switch back
  *                            |                                  |
  *                 Running in background               Running in background
@@ -99,6 +99,13 @@ namespace UWPStudyApp1
         }
 
         //the best location to load UI assets 
+        /*
+         * When a user launches your app normally (for example, by tapping the app tile),
+         * only the OnLaunched method is called. 
+         * Override the OnActivated method to perform any general app initialization that should occur
+         * only when the app is not launched normally (for example, from another app through the Search contract). 
+         * You can determine how the app was activated through the IActivatedEventArgs.Kind property. 
+         */
         protected override void OnActivated(IActivatedEventArgs args)
         {
             base.OnActivated(args);

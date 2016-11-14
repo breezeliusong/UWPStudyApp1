@@ -76,7 +76,7 @@ namespace UWPStudyApp1
             base.OnNavigatedFrom(e);
             foreach (var ss in con)
             {
-                var sk = ss.Value.Values;
+               var sk= ss.Value.Values;
             }
         }
 
@@ -697,5 +697,31 @@ namespace UWPStudyApp1
             promptOptions.TreatAsUntrusted = true;
             var success = await Windows.System.Launcher.LaunchUriAsync(uriBing, promptOptions);
         }
+
+        //creat containers
+        private  void Containers()
+        {
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            var localFolder = ApplicationData.Current.LocalFolder;
+
+            //Setting in a contaioner
+            ApplicationDataContainer container = localSettings.CreateContainer("exampleContainer", ApplicationDataCreateDisposition.Always);
+            if (localSettings.Containers.ContainsKey("exampleContainer"))
+            {
+                localSettings.Containers["exampleContainer"].Values["exampleSetting"] = "hello windows";
+            }
+            //delete containers and settings
+            localSettings.Values.Remove("exampleSetting");
+
+            // Delete composite setting
+            localSettings.Values.Remove("exampleCompositeSetting");
+
+            // Delete container
+            localSettings.DeleteContainer("exampleContainer");
+
+
+        }
+
+
     }
 }
